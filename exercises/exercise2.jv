@@ -19,7 +19,7 @@ pipeline BaumplfanzungPipeline {
     }
 
     constraint stadtteilConstraint oftype RegexConstraint {
-        regex: /^Vogelsang/;
+        regex: /^Vogelsang$/;
     }
 
     constraint idConstraint oftype RegexConstraint {
