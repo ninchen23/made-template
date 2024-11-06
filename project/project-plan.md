@@ -4,11 +4,11 @@
 
 <!-- Give your project a short title. -->
 
-Awesome MADE project.
+The impact of air pollution on chronic diseases
 
 ## Main Question
 
-How does air pollution in the XXX most biggest cities in the US correlate with cases of chronic conditions, specifically XXX?
+How does air pollution in the biggest cities in the US correlate with cases of chronic diseases?
 
 <!-- Think about one main question you want to answer based on the data. -->
 
@@ -24,11 +24,11 @@ Air pollution is an important problem, because it affects cities all over the wo
 
 ### Datasource 1:
 
-- Metadata URL:
-- Data URL:
+- Metadata URL: https://catalog.data.gov/harvest/object/2369f820-3c3c-4e0f-bc8c-2fe4d78311ef
+- Data URL: https://data.cdc.gov/api/views/cjae-szjv/rows.csv?accessType=DOWNLOAD
 - Data Type: CSV
 
-This data source contains information about air pollution in different areas in the U.S. It is available under the XXX License.
+This data source contains information about air pollution in different areas in the U.S. It is available under the Open Database License.
 
 ### Datasource 2: U.S. Chronic Disease Indicators (CDI), 2023 Release
 
@@ -42,7 +42,7 @@ This data source contains information about the frequency of different chronic d
 
 <!-- List of work packages ordered sequentially, each pointing to an issue with more details. -->
 
-1. Look for more open data sources that might be more current [#1][i1]
+1. Look for more open data sources that might be more recent [#1][i1]
 2. Look at the data for more insights [#2][i2]
 3. Clean the data out off missing, possibly wrong or unneeded values [#3][i3]
 4. Create graphs to visualize the data [#4][i4]
