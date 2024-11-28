@@ -1,0 +1,111 @@
+
+pipeline BatterietemperaturmessungsPipeline {
+    // base pipeline
+    MessungenExtractor
+        -> MessungenUnzipper
+        -> MessungenPicker
+        -> MessungenTextFileInterpreter
+        -> MessungenCSVInterpreter
+        -> MessungenSelector
+        -> RenameHeaderCellWriter
+        -> MessungenTableInterpreter
+        -> temperatureTransformer
+        -> battery_temperatureTransformer
+        -> measurementLoader;
+
+
+
+    block MessungenExtractor oftype HttpExtractor {
+        url: "https://www.mowesta.com/data/measure/mowesta-dataset-20221107.zip";
+    }
+    block MessungenUnzipper oftype ArchiveInterpreter {
+        archiveType: "zip";
+    }
+    block MessungenPicker oftype FilePicker {
+        path: "./data.csv";
+    }
+    block MessungenTextFileInterpreter oftype TextFileInterpreter { }
+    block MessungenCSVInterpreter oftype CSVInterpreter {
+        delimiter: ";";
+    }
+    // ignore all columns to the right of the first "Gerät aktiv"
+    block MessungenSelector oftype CellRangeSelector {
+        select: range A1:K*;
+    }
+    block RenameHeaderCellWriter oftype CellWriter {
+        at: range A1:K1;
+        write: [
+            "id",
+            "producer",
+            "model",
+            "month",
+            "temperature",
+            "",
+            "",
+            "",
+            "",
+            "battery_temperature",
+            ""
+        ];
+    }
+    block MessungenTableInterpreter oftype TableInterpreter {
+        header: true;
+        columns: [
+            "id" oftype id,
+            "producer" oftype text,
+            "model" oftype text,
+            "month" oftype month,
+            "temperature" oftype decimal,
+            "battery_temperature" oftype decimal
+        ];
+    }
+    block temperatureTransformer oftype TableTransformer {
+        inputColumns: [
+            'temperature'
+        ];
+        outputColumn: 'temperature';
+        uses: CelsiusToFahrenheit;
+    }
+    block battery_temperatureTransformer oftype TableTransformer {
+        inputColumns: [
+            'battery_temperature'
+        ];
+        outputColumn: 'battery_temperature';
+        uses: CelsiusToFahrenheit;
+    }
+    block measurementLoader oftype SQLiteLoader {
+        table: "temperatures";
+        file: "./temperatures.sqlite";
+    }
+
+
+
+
+    // constraints
+    valuetype id oftype integer {
+        constraints: [
+            idConstraint
+        ];
+    }
+    constraint idConstraint oftype RangeConstraint {
+        lowerBound: 0;
+    }
+
+    valuetype month oftype integer {
+        constraints: [
+            monthConstraint
+        ];
+    }
+    constraint monthConstraint oftype RangeConstraint {
+        lowerBound: 1;
+        upperBound: 12;
+    }
+
+    // transformations
+    transform CelsiusToFahrenheit {
+        from Celsius oftype decimal;
+        to Fahrenheit oftype decimal;
+        Fahrenheit: (Celsius * 9/5) + 32;
+    }
+}
+
