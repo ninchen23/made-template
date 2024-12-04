@@ -151,7 +151,7 @@ def transform_cancer_rates(df: pd.DataFrame) -> pd.DataFrame:
 
         # import pdb; pdb.set_trace()
         print("Successfully transformed cancer rates")
-        return df2
+        return df2.reset_index(drop=True)
     except Exception as e:
         raise Exception(f"Error while transforming cancer rates: {e}")
 
@@ -165,50 +165,54 @@ def save_to_sqlite_database(df: pd.DataFrame, table_name: str, db_url: str='sqli
 
 
 
-### download and transform the data for air pollution
-air_pollution_urls = [
-    "https://aqs.epa.gov/aqsweb/airdata/annual_aqi_by_county_2021.zip",
-    "https://aqs.epa.gov/aqsweb/airdata/annual_aqi_by_county_2020.zip",
-    "https://aqs.epa.gov/aqsweb/airdata/annual_aqi_by_county_2019.zip",
-    "https://aqs.epa.gov/aqsweb/airdata/annual_aqi_by_county_2018.zip",
-    "https://aqs.epa.gov/aqsweb/airdata/annual_aqi_by_county_2017.zip",
-    "https://aqs.epa.gov/aqsweb/airdata/annual_aqi_by_county_2016.zip",
-    "https://aqs.epa.gov/aqsweb/airdata/annual_aqi_by_county_2015.zip",
-    "https://aqs.epa.gov/aqsweb/airdata/annual_aqi_by_county_2014.zip",
-    "https://aqs.epa.gov/aqsweb/airdata/annual_aqi_by_county_2013.zip",
-    "https://aqs.epa.gov/aqsweb/airdata/annual_aqi_by_county_2012.zip",
-    "https://aqs.epa.gov/aqsweb/airdata/annual_aqi_by_county_2011.zip",
-    "https://aqs.epa.gov/aqsweb/airdata/annual_aqi_by_county_2010.zip",
-    "https://aqs.epa.gov/aqsweb/airdata/annual_aqi_by_county_2009.zip",
-    "https://aqs.epa.gov/aqsweb/airdata/annual_aqi_by_county_2008.zip",
-    "https://aqs.epa.gov/aqsweb/airdata/annual_aqi_by_county_2007.zip",
-    "https://aqs.epa.gov/aqsweb/airdata/annual_aqi_by_county_2006.zip"
-]
+def main():
+    ### download and transform the data for air pollution
+    air_pollution_urls = [
+        "https://aqs.epa.gov/aqsweb/airdata/annual_aqi_by_county_2021.zip",
+        "https://aqs.epa.gov/aqsweb/airdata/annual_aqi_by_county_2020.zip",
+        "https://aqs.epa.gov/aqsweb/airdata/annual_aqi_by_county_2019.zip",
+        "https://aqs.epa.gov/aqsweb/airdata/annual_aqi_by_county_2018.zip",
+        "https://aqs.epa.gov/aqsweb/airdata/annual_aqi_by_county_2017.zip",
+        "https://aqs.epa.gov/aqsweb/airdata/annual_aqi_by_county_2016.zip",
+        "https://aqs.epa.gov/aqsweb/airdata/annual_aqi_by_county_2015.zip",
+        "https://aqs.epa.gov/aqsweb/airdata/annual_aqi_by_county_2014.zip",
+        "https://aqs.epa.gov/aqsweb/airdata/annual_aqi_by_county_2013.zip",
+        "https://aqs.epa.gov/aqsweb/airdata/annual_aqi_by_county_2012.zip",
+        "https://aqs.epa.gov/aqsweb/airdata/annual_aqi_by_county_2011.zip",
+        "https://aqs.epa.gov/aqsweb/airdata/annual_aqi_by_county_2010.zip",
+        "https://aqs.epa.gov/aqsweb/airdata/annual_aqi_by_county_2009.zip",
+        "https://aqs.epa.gov/aqsweb/airdata/annual_aqi_by_county_2008.zip",
+        "https://aqs.epa.gov/aqsweb/airdata/annual_aqi_by_county_2007.zip",
+        "https://aqs.epa.gov/aqsweb/airdata/annual_aqi_by_county_2006.zip"
+    ]
 
-first = True
-counter_of_failed_processings = 0
-for url in air_pollution_urls:
+    first = True
+    counter_of_failed_processings = 0
+    for url in air_pollution_urls:
+        try:
+            df = download_zip_with_csv(url)
+            df = aggregate_aqi_data(df)
+            if first:
+                first = False
+                save_to_sqlite_database(df, 'aqi', if_exists='replace')
+            else:
+                save_to_sqlite_database(df, 'aqi')#'aqi_' + url[-8:-4])
+        except Exception as e:
+            print(f"Failed to download, process or save AQI data with url {url}: {e}")
+            counter_of_failed_processings += 1
+            if counter_of_failed_processings >= (len(air_pollution_urls) - 10):
+                raise Exception("Too many failed downloads or processings of AQI datasets. Data pipeline is stopped now.")
+
+
+
+    ### download and transform the data for cancer rates
     try:
-        df = download_zip_with_csv(url)
-        df = aggregate_aqi_data(df)
-        if first:
-            first = False
-            save_to_sqlite_database(df, 'aqi', if_exists='replace')
-        else:
-            save_to_sqlite_database(df, 'aqi')#'aqi_' + url[-8:-4])
+        xml_data = download_cancer_rates_xml()
+        df = process_cancer_rates_xml(xml_data)
+        df = transform_cancer_rates(df)
+        save_to_sqlite_database(df, 'cancer_rates', if_exists='replace')
     except Exception as e:
-        print(f"Failed to download, process or save AQI data with url {url}: {e}")
-        counter_of_failed_processings += 1
-        if counter_of_failed_processings >= (len(air_pollution_urls) - 10):
-            raise Exception("Too many failed downloads or processings of AQI datasets. Data pipeline is stopped now.")
+        raise Exception(f"Failed to download, process or save cancer rates data with error: {e}. Data pipeline is stopped now.")
 
-
-
-### download and transform the data for cancer rates
-try:
-    xml_data = download_cancer_rates_xml()
-    df = process_cancer_rates_xml(xml_data)
-    df = transform_cancer_rates(df)
-    save_to_sqlite_database(df, 'cancer_rates', if_exists='replace')
-except Exception as e:
-    raise Exception(f"Failed to download, process or save cancer rates data with error: {e}. Data pipeline is stopped now.")
+if __name__ == '__main__':
+    main()
