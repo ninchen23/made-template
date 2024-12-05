@@ -47,7 +47,7 @@ def download_cancer_rates_xml() -> str:
             raise Exception(f"Download of cancer rates failed with status code {response.status_code}: {response.text}")
     except Exception as e:
         raise Exception(f"Error: {e}")
-    
+
 
 def aggregate_aqi_data(df: pd.DataFrame) -> pd.DataFrame:
     try:

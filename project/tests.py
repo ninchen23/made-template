@@ -1,20 +1,3 @@
-# Aufgabe: unit tests for extract, transform, load
-# ein oder zwei system tests für die ganze data pipeline (überprüfen, dass daten korrekt gespeichert sind)
-
-# test isolated pipeline steps (replace by test doubles)
-# mock data -> test specific edge cases that may not exists in real data    
-#      copy production data or parts of it
-# test whole pipeline
-
-# test that database is created
-# test that tables exist
-# test that correct columns exist
-# test that after two times load still data only is there once
-# test for null and zero data
-
-
-
-# from numpy import NaN
 import pipeline
 import sqlite3
 import os
@@ -97,7 +80,7 @@ def test_process_cancer_rates_xml():
 
     # assert
     # test that only the relevant columns are in the result
-    # test that the data was extracted correctly and unnecessary data was dropped
+    # test that the data was extracted correctly and unnecessary metadata data was dropped
     expected_df = pd.DataFrame({
         'State': ['New York', 'New York', 'New York', 'Texas', 'Texas', 'Texas'],
         'Year': [2019, 2020, 2021, 2019, 2020, 2021],
@@ -179,7 +162,7 @@ def test_save_to_sqlite_database():
         os.remove('test.sqlite')
 
 
-### System tests for the whole pipeline
+### Integration test transorm and load
 
 def test_pipeline_with_mock_data():
     # arrange
@@ -262,6 +245,9 @@ def test_pipeline_with_mock_data():
         # cleanup
         os.remove('test.sqlite')
     
+
+### System test for the whole pipeline
+
 def test_pipeline_with_real_data():
     try:
         os.remove('../data/data.sqlite')
