@@ -40,18 +40,18 @@ jobs:
 
       - name: Install Python dependencies
         run: |
-          ls -la
           pip install -r main/project/requirements.txt
 
       # Run project tests
       - name: Execute tests
         id: ex_tests
         run: |
-          ./main/project/tests.sh > result.log
+          cd main/project
+          ./tests.sh > result.log
 
       # Upload tests report
       - name: Upload tests report
         uses: actions/upload-artifact@v4
         with:
           name: tests-report
-          path: result.log
+          path: main/project/result.log
