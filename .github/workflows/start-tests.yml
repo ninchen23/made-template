@@ -41,10 +41,12 @@ jobs:
       - name: Set Working Path
         run: |
           cd main
+          ls -la
 
       - name: Install Python dependencies
         run: |
-          pip install -r project/requirements.txt
+          ls -la
+          pip install -r main/project/requirements.txt
 
       # Run project tests
       - name: Execute tests
