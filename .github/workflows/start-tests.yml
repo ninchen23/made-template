@@ -38,11 +38,6 @@ jobs:
         with:
           python-version: 3.11
 
-      - name: Set Working Path
-        run: |
-          cd main
-          ls -la
-
       - name: Install Python dependencies
         run: |
           ls -la
@@ -52,7 +47,7 @@ jobs:
       - name: Execute tests
         id: ex_tests
         run: |
-          ./project/tests.sh > result.log
+          ./main/project/tests.sh > result.log
 
       # Upload tests report
       - name: Upload tests report
