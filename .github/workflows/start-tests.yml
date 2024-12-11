@@ -48,4 +48,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-database
-          path: data/data.sqlite
+          path: main/data/data.sqlite
