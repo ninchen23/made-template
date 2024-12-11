@@ -4,8 +4,9 @@ on:
   push:
     branches:
       - main
-    # paths:
-    #   - project/**
+    paths:
+      - project/**
+      - .github/workflows/start-tests.yml
 
 jobs:
   execute-tests:
@@ -16,28 +17,13 @@ jobs:
         with:
           path: main
 
-      # - name: Checkout exercise feedback
-      #   uses: actions/checkout@v4
-      #   with:
-      #     repository: jvalue/made-exercise-feedback
-      #     path: grading
-
-      # - name: Set up Node
-      #   uses: actions/setup-node@v4
-      #   with:
-      #     node-version: "lts/*"
-
-      # # Install jayvee
-      # - name: Set up Jayvee
-      #   run: |
-      #     ./grading/ci/setup_jayvee.sh
-
       # Install python
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
           python-version: 3.11
 
+      # Install Python dependencies
       - name: Install Python dependencies
         run: |
           pip install -r main/project/requirements.txt
@@ -47,9 +33,9 @@ jobs:
         id: ex_tests
         run: |
           cd main/project
-          ./tests.sh > result.log
+          ./tests.sh | tee result.log
 
-      # Upload tests report
+      # Upload full tests report
       - name: Upload tests report
         if: always()
         uses: actions/upload-artifact@v4
@@ -57,7 +43,9 @@ jobs:
           name: tests-report
           path: main/project/result.log
 
+      # Upload database of test with real data
       - name: Upload database of test-results
         uses: actions/upload-artifact@v4
         with:
-          name: data/data.sqlite
+          name: test-database
+          path: data/data.sqlite
