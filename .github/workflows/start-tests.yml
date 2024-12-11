@@ -51,7 +51,13 @@ jobs:
 
       # Upload tests report
       - name: Upload tests report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: tests-report
           path: main/project/result.log
+
+      - name: Upload database of test-results
+        uses: actions/upload-artifact@v4
+        with:
+          name: data/data.sqlite

@@ -1,5 +1,6 @@
 #!/bin/bash
-pytest tests.py
+echo "Running tests"
+pytest -v tests.py
 
 
 # pytest needs to be installed
