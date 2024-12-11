@@ -38,6 +38,11 @@ jobs:
         with:
           python-version: 3.11
 
+      - name: Debug
+        run: |
+          ls -la
+          pwd
+
       - name: Install Python dependencies
         run: |
           pip install -r project/requirements.txt
