@@ -4,8 +4,8 @@ on:
   push:
     branches:
       - main
-    paths:
-      - project/**
+    # paths:
+    #   - project/**
 
 jobs:
   execute-tests:
@@ -38,13 +38,9 @@ jobs:
         with:
           python-version: 3.11
 
-      - name: Debug
+      - name: Set Working Path
         run: |
-          ls -la
-          pwd
           cd main
-          ls -la
-          pwd
 
       - name: Install Python dependencies
         run: |
