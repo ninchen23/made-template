@@ -1,0 +1,56 @@
+name: Execute Project Tests
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - project/**
+
+jobs:
+  execute-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: main
+
+      # - name: Checkout exercise feedback
+      #   uses: actions/checkout@v4
+      #   with:
+      #     repository: jvalue/made-exercise-feedback
+      #     path: grading
+
+      # - name: Set up Node
+      #   uses: actions/setup-node@v4
+      #   with:
+      #     node-version: "lts/*"
+
+      # # Install jayvee
+      # - name: Set up Jayvee
+      #   run: |
+      #     ./grading/ci/setup_jayvee.sh
+
+      # Install python
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+
+      - name: Install Python dependencies
+        run: |
+          pip install -r project/requirements.txt
+
+      # Run project tests
+      - name: Execute tests
+        id: ex_tests
+        run: |
+          ./project/tests.sh > result.log
+
+      # Upload tests report
+      - name: Upload tests report
+        uses: actions/upload-artifact@v4
+        with:
+          name: tests-report
+          path: result.log
